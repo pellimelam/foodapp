@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 
@@ -7,14 +6,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>Village Food Marketplace</title>
-
 <meta name="description" content="Local village food ordering platform - Offer, Demand, Donate">
 
 <link rel="stylesheet" href="./css/design-system.css">
 <link rel="stylesheet" href="./css/main.css">
 
 <!-- Razorpay -->
-
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 </head>
@@ -22,37 +19,32 @@
 <body>
 
 <!-- ================= NAV ================= -->
-
 <div class="nav">
   <div class="nav-inner">
 
-```
-<div class="brand">
-  🍽 Food Market
-</div>
+    <div class="brand">
+      🍽 Food Market
+    </div>
 
-<div class="nav-links" id="navLinks">
-  <a href="#">Home</a>
-  <a href="#">Categories</a>
-  <a href="#">Support</a>
-</div>
+    <div class="nav-links" id="navLinks">
+      <a href="#">Home</a>
+      <a href="#">Categories</a>
+      <a href="#">Support</a>
+    </div>
 
-<div class="nav-toggle" id="navToggle">
-  <span></span>
-  <span></span>
-  <span></span>
-</div>
-```
+    <div class="nav-toggle" id="navToggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
 
   </div>
 </div>
 
 <!-- ================= MAIN ================= -->
-
 <div class="container">
 
   <!-- SLIDER -->
-
   <div class="card" style="padding:0;margin-top:20px;">
     <div class="slider">
       <div class="slides" id="slides"></div>
@@ -61,40 +53,35 @@
   </div>
 
   <!-- CATEGORIES -->
-
   <div class="card" style="margin-top:16px;padding:12px;">
     <div id="categories" style="display:flex;gap:12px;overflow-x:auto;"></div>
   </div>
 
   <!-- ITEMS -->
-
   <div id="items" style="margin-top:10px;"></div>
 
 </div>
 
-<!-- ================= MODAL ROOT ================= -->
-
-<div id="modal-root"></div>
-
 <!-- ================= FOOTER ================= -->
-
 <div class="footer">
   © Village Marketplace • Powered by Vidhwaan
 </div>
 
 <!-- ================= NAV MOBILE SCRIPT ================= -->
-
 <script>
-const toggle = document.getElementById("navToggle");
-const links = document.getElementById("navLinks");
+document.addEventListener("DOMContentLoaded", function(){
 
-toggle.onclick = ()=>{
-  links.classList.toggle("active");
-};
+  const toggle = document.getElementById("navToggle");
+  const links = document.getElementById("navLinks");
+
+  toggle.onclick = function(){
+    links.classList.toggle("active");
+  };
+
+});
 </script>
 
 <!-- ================= APP ================= -->
-
 <script src="./app.js"></script>
 
 </body>
