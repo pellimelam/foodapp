@@ -1,8 +1,32 @@
+async function toBase64(file){
+  return new Promise((resolve)=>{
+    const reader = new FileReader();
+    reader.onload = ()=>resolve(reader.result);
+    reader.readAsDataURL(file);
+  });
+}
+
+async function compressImage(file){
+
+  const img = await createImageBitmap(file);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 800;
+  canvas.height = 800;
+
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(img, 0, 0, 800, 800);
+
+  return canvas.toDataURL("image/webp", 0.7);
+}
+
+
+
 /* =========================
    CONFIG
 ========================= */
 
-const API = "https://late-field-305a.propertiesgrouphyd.workers.dev/"; // set your worker URL if different domain
+const API = "https://late-field-305a.propertiesgrouphyd.workers.dev";
 
 const CATEGORY_CONFIG = [
   { key: "offer", label: "Offer", color: "#22c55e" },
@@ -197,8 +221,12 @@ function renderFiltered(items) {
 ========================= */
 
 function inc(i) {
+  const item = DATA[CURRENT][i];
   const el = document.getElementById("q_" + i);
-  el.innerText = +el.innerText + 1;
+
+  if (+el.innerText < item.remaining) {
+    el.innerText++;
+  }
 }
 
 function dec(i) {
@@ -240,16 +268,30 @@ async function payOrder(i, qty) {
   const item = DATA[CURRENT][i];
   const userId = document.getElementById("uid").value;
 
+  if (!userId) {
+    alert("Enter your ID");
+    return;
+  }
+
+  alert("Processing payment...");
+
   const res = await fetch(API + "/create-order", {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ amount: item.price * qty })
   });
+
+  if (!res.ok) {
+    alert("Server error. Try again.");
+    return;
+  }
 
   const order = await res.json();
 
   const rzp = new Razorpay({
-    key: "YOUR_KEY_ID",
+    key: "rzp_live_SO4F7YCOOnRVRZ", // 🔥 REPLACE THIS
     order_id: order.id,
+
     handler: async (resp) => {
 
       await fetch(API + "/verify-order", {
@@ -279,32 +321,58 @@ async function payOrder(i, qty) {
    ADD
 ========================= */
 
-function openAdd() {
+function openAdd(){
 
-  document.body.insertAdjacentHTML("beforeend", `
-    <div class="modal">
-      <div class="card">
+  openModal(`
+    <h3>Add Item</h3>
 
-        <h3>Add Item</h3>
+    <input id="aid" placeholder="Unique ID"><br>
+    <input id="name" placeholder="Name"><br>
+    <input id="price" placeholder="Price"><br>
+    <input id="qty" placeholder="Unit"><br>
+    <input id="total" placeholder="Total stock"><br>
+    <input id="time" placeholder="Delivery time"><br>
 
-        <input id="aid" placeholder="Unique ID"><br>
-        <input id="name" placeholder="Name"><br>
-        <input id="price" placeholder="Price"><br>
-        <input id="qty" placeholder="Unit (1 plate)"><br>
-        <input id="total" placeholder="Total stock"><br>
-        <input id="time" placeholder="Delivery time"><br>
+    <input id="img" type="file" multiple><br>
 
-        <input id="img" type="file" multiple><br>
-
-        <button onclick="submitAdd()">Submit & Pay ₹1</button>
-        <button onclick="closeModal()">Cancel</button>
-
-      </div>
-    </div>
+    <button onclick="submitAdd()">Submit & Pay ₹1</button>
   `);
 }
 
 async function submitAdd() {
+
+  const files = document.getElementById("img").files;
+
+  if (files.length > 5) {
+    alert("Max 5 images");
+    return;
+  }
+
+  let imageUrls = [];
+
+  for (let f of files) {
+    try {
+      const compressed = await compressImage(f);
+
+      const res = await fetch(API + "/upload-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ base64: compressed })
+      });
+
+      if (!res.ok) {
+        alert("Image upload failed");
+        return;
+      }
+
+      const data = await res.json();
+      imageUrls.push(data.url);
+
+    } catch {
+      alert("Image error");
+      return;
+    }
+  }
 
   const payload = {
     userId: document.getElementById("aid").value,
@@ -313,19 +381,33 @@ async function submitAdd() {
     quantity: document.getElementById("qty").value,
     total: +document.getElementById("total").value,
     time: +document.getElementById("time").value,
-    images: []
+    images: imageUrls
   };
+
+  if (!payload.userId || !payload.name || !payload.price) {
+    alert("Fill all fields");
+    return;
+  }
+
+  alert("Processing payment...");
 
   const res = await fetch(API + "/create-order", {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ amount: 1 })
   });
+
+  if (!res.ok) {
+    alert("Server error");
+    return;
+  }
 
   const order = await res.json();
 
   const rzp = new Razorpay({
-    key: "YOUR_KEY_ID",
+    key: "rzp_live_SO4F7YCOOnRVRZ", // 🔥 REPLACE THIS
     order_id: order.id,
+
     handler: async (resp) => {
 
       await fetch(API + "/verify-add", {
@@ -345,7 +427,6 @@ async function submitAdd() {
 
   rzp.open();
 }
-
 /* =========================
    DELETE
 ========================= */
@@ -390,8 +471,22 @@ async function submitDelete() {
    MODAL
 ========================= */
 
-function closeModal() {
-  document.querySelectorAll(".modal").forEach(m => m.remove());
+function openModal(html){
+
+  document.body.insertAdjacentHTML("beforeend", `
+    <div class="modal" onclick="closeModal(event)">
+      <div class="card" onclick="event.stopPropagation()">
+        ${html}
+        <button onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  `);
+}
+
+function closeModal(e){
+  if(!e || e.target.classList.contains("modal")){
+    document.querySelectorAll(".modal").forEach(m=>m.remove());
+  }
 }
 
 /* =========================
