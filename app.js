@@ -2,7 +2,7 @@
    CONFIG
 ========================= */
 
-const API = ""; // set your worker URL if different domain
+const API = "https://late-field-305a.propertiesgrouphyd.workers.dev/"; // set your worker URL if different domain
 
 const CATEGORY_CONFIG = [
   { key: "offer", label: "Offer", color: "#22c55e" },
