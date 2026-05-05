@@ -3,16 +3,25 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 <title>Village Food Marketplace</title>
 <meta name="description" content="Local village food ordering platform - Offer, Demand, Donate">
 
+<!-- Performance -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="theme-color" content="#020617">
+
+<!-- Preconnect (faster Razorpay + CDN) -->
+<link rel="preconnect" href="https://checkout.razorpay.com">
+<link rel="dns-prefetch" href="https://checkout.razorpay.com">
+
+<!-- CSS -->
 <link rel="stylesheet" href="./css/design-system.css">
 <link rel="stylesheet" href="./css/main.css">
 
 <!-- Razorpay -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
 
 </head>
 
@@ -67,22 +76,22 @@
   © Village Marketplace • Powered by Vidhwaan
 </div>
 
-<!-- ================= NAV MOBILE SCRIPT ================= -->
+<!-- ================= NAV SCRIPT ================= -->
 <script>
 document.addEventListener("DOMContentLoaded", function(){
 
   const toggle = document.getElementById("navToggle");
   const links = document.getElementById("navLinks");
 
-  toggle.onclick = function(){
+  toggle.addEventListener("click", function(){
     links.classList.toggle("active");
-  };
+  });
 
 });
 </script>
 
 <!-- ================= APP ================= -->
-<script src="./app.js"></script>
+<script src="./app.js" defer></script>
 
 </body>
 </html>
